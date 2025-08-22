@@ -12,6 +12,7 @@ public class QB7 {
 
     public static void main(String[] args) {
         String[] tasks = new String[100];
+        boolean[] done = new boolean[100];
         int size = 0;
 
         System.out.println(LINE);
@@ -34,13 +35,43 @@ public class QB7 {
                 } else {
                     System.out.println(LINE);
                     for (int i = 0; i < size; i++) {
-                        System.out.println(" " + (i + 1) + ". " + tasks[i]);
+                        String box = done[i] ? "[X]" : "[ ]";
+                        System.out.println(" " + (i + 1) + "." + box + " " + tasks[i]);
                     }
                     System.out.println(LINE);
                 }
-            } else {
-                // add task (assume size <= 100 per spec)
-                tasks[size++] = input;
+            } else if (input.startsWith("mark ")) {
+                // mark <index>
+                try {
+                    int idx = Integer.parseInt(input.substring(5).trim()); // 1-based
+                    if (idx < 1 || idx > size) throw new IndexOutOfBoundsException();
+                    done[idx - 1] = true;
+                    printBlock(
+                            "Nice! I've marked this task as done:",
+                            "  " + "[X] " + tasks[idx - 1]
+                    );
+                } catch (Exception e) {
+                    printBlock("Invalid index for mark.");
+                }
+
+            } else if (input.startsWith("unmark ")) {
+                // unmark <index>
+                try {
+                    int idx = Integer.parseInt(input.substring(7).trim()); // 1-based
+                    if (idx < 1 || idx > size) throw new IndexOutOfBoundsException();
+                    done[idx - 1] = false;
+                    printBlock(
+                            "OK, I've marked this task as not done yet:",
+                            "  " + "[ ] " + tasks[idx - 1]
+                    );
+                } catch (Exception e) {
+                    printBlock("Invalid index for unmark.");
+                }
+            } else if (!input.isEmpty()) {
+                // add task
+                tasks[size] = input;
+                done[size] = false;
+                size++;
                 printBlock("added: " + input);
             }
         }
