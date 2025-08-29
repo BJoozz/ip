@@ -1,5 +1,5 @@
+import java.util.ArrayList;
 import java.util.Scanner;
-
 public class QB7 {
     private static final String LINE = "____________________________________________________________";
     private static void printBlock(String... lines) {
@@ -26,8 +26,7 @@ public class QB7 {
     }
 
     public static void main(String[] args) {
-        Task[] tasks = new Task[100];
-        int size = 0;
+        ArrayList<Task> tasks = new ArrayList<>(100);
 
         System.out.println(LINE);
         System.out.println(" Hello! I'm QB7");
@@ -48,38 +47,51 @@ public class QB7 {
                 if (line.equals("list")) {
                     System.out.println(LINE);
                     System.out.println(" Here are the tasks in your list:");
-                    for (int i = 0; i < size; i++) {
-                        System.out.println(" " + (i + 1) + "." + tasks[i]);
+                    for (int i = 0; i < tasks.size(); i++) {
+                        System.out.println(" " + (i + 1) + "." + tasks.get(i));
                     }
                     System.out.println(LINE);
                     continue;
                 }
 
-                // Level-3: mark / unmark (validate index)
+                // mark / unmark
                 if (line.startsWith("mark ")) {
-                    int idx = parseIndex(line.substring(5), "mark", size);
-                    tasks[idx - 1].markAsDone();
-                    printBlock("Nice! I've marked this task as done:", "  " + tasks[idx - 1]);
+                    int idx = parseIndex(line.substring(5), "mark", tasks.size());
+                    tasks.get(idx - 1).markAsDone();
+                    printBlock("Nice! I've marked this task as done:", "  " + tasks.get(idx - 1));
                     continue;
                 }
                 if (line.startsWith("unmark ")) {
-                    int idx = parseIndex(line.substring(7), "unmark", size);
-                    tasks[idx - 1].markAsNotDone();
-                    printBlock("OK, I've marked this task as not done yet:", "  " + tasks[idx - 1]);
+                    int idx = parseIndex(line.substring(7), "unmark", tasks.size());
+                    tasks.get(idx - 1).markAsNotDone();
+                    printBlock("OK, I've marked this task as not done yet:", "  " + tasks.get(idx - 1));
                     continue;
                 }
 
-                // Level-4: todo
+                // NEW: delete
+                if (line.startsWith("delete ")) {
+                    int idx = parseIndex(line.substring(7), "delete", tasks.size());
+                    Task removed = tasks.remove(idx - 1);
+                    printBlock(
+                            "Noted. I've removed this task:",
+                            "  " + removed,
+                            "Now you have " + tasks.size() + " tasks in the list."
+                    );
+                    continue;
+                }
+
+                // todo
                 if (line.equals("todo")) throw new EmptyDescriptionException("todo");
                 if (line.startsWith("todo ")) {
                     String desc = need(line.substring(5), "todo");
                     Task t = new Todo(desc);
-                    tasks[size++] = t;
-                    printBlock("Got it. I've added this task:", "  " + t, "Now you have " + size + " tasks in the list.");
+                    tasks.add(t);
+                    printBlock("Got it. I've added this task:", "  " + t,
+                            "Now you have " + tasks.size() + " tasks in the list.");
                     continue;
                 }
 
-                // Level-4: deadline
+                // deadline
                 if (line.equals("deadline")) throw new EmptyDescriptionException("deadline");
                 if (line.startsWith("deadline ")) {
                     String body = need(line.substring(9), "deadline");
@@ -88,12 +100,13 @@ public class QB7 {
                     String desc = need(parts[0], "deadline");
                     String by = need(parts[1], "/by <time>");
                     Task t = new Deadline(desc, by);
-                    tasks[size++] = t;
-                    printBlock("Got it. I've added this task:", "  " + t, "Now you have " + size + " tasks in the list.");
+                    tasks.add(t);
+                    printBlock("Got it. I've added this task:", "  " + t,
+                            "Now you have " + tasks.size() + " tasks in the list.");
                     continue;
                 }
 
-                // Level-4: event
+                // event
                 if (line.equals("event")) throw new EmptyDescriptionException("event");
                 if (line.startsWith("event ")) {
                     String body = need(line.substring(6), "event");
@@ -105,18 +118,18 @@ public class QB7 {
                     String from = need(p2[0], "/from <start>");
                     String to = need(p2[1], "/to <end>");
                     Task t = new Event(desc, from, to);
-                    tasks[size++] = t;
-                    printBlock("Got it. I've added this task:", "  " + t, "Now you have " + size + " tasks in the list.");
+                    tasks.add(t);
+                    printBlock("Got it. I've added this task:", "  " + t,
+                            "Now you have " + tasks.size() + " tasks in the list.");
                     continue;
                 }
 
-                // Unknown command (Level-5 minimal)
+                // unknown
+                if (!line.isEmpty()) throw new QB7Exception("I don't recognise the command: \"" + line + "\"");
 
             } catch (QB7Exception e) {
-                // Friendly, specific error message block
                 printBlock("Uh oh! " + e.getMessage());
             } catch (Exception e) {
-                // Safety net for unexpected bugs
                 printBlock("Something went wrong internally: " + e.getClass().getSimpleName());
             }
         }

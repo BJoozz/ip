@@ -6,4 +6,7 @@ unmark 2
 deadline submit report /by Sunday
 event project meeting /from Mon 2pm /to 4pm
 list
+delete 3
+delete 2
+list
 bye
