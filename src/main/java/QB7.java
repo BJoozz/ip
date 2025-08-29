@@ -10,6 +10,21 @@ public class QB7 {
         System.out.println(LINE);
     }
 
+    private static int parseIndex(String s, String action, int size) throws QB7Exception {
+        try {
+            int idx = Integer.parseInt(s.trim());
+            if (idx < 1 || idx > size) throw new InvalidIndexException(action);
+            return idx;
+        } catch (NumberFormatException e) {
+            throw new InvalidIndexException(action);
+        }
+    }
+
+    private static String need(String s, String what) throws QB7Exception {
+        if (s == null || s.trim().isEmpty()) throw new EmptyDescriptionException(what);
+        return s.trim();
+    }
+
     public static void main(String[] args) {
         Task[] tasks = new Task[100];
         int size = 0;
@@ -21,120 +36,88 @@ public class QB7 {
 
         Scanner sc = new Scanner(System.in);
         while (sc.hasNextLine()) {
-            String input = sc.nextLine().trim();
+            String line = sc.nextLine().trim();
 
-            // Exit
-            if (input.equals("bye")) {
+            if (line.equals("bye")) {
                 printBlock("Bye. Hope to see you again soon!");
                 break;
             }
 
-            // List
-            if (input.equals("list")) {
-                if (size == 0) {
-                    printBlock("Here are the tasks in your list:");
-                } else {
+            try {
+                // list
+                if (line.equals("list")) {
                     System.out.println(LINE);
                     System.out.println(" Here are the tasks in your list:");
                     for (int i = 0; i < size; i++) {
-                        // match sample: "1.[T][X] read book"
-                        System.out.println(" " + (i + 1) + "." + tasks[i].toString());
+                        System.out.println(" " + (i + 1) + "." + tasks[i]);
                     }
                     System.out.println(LINE);
+                    continue;
                 }
-                continue;
-            }
 
-            // Mark / Unmark (Level-3)
-            if (input.startsWith("mark ")) {
-                try {
-                    int idx = Integer.parseInt(input.substring(5).trim()); // 1-based
-                    if (idx < 1 || idx > size) throw new IndexOutOfBoundsException();
+                // Level-3: mark / unmark (validate index)
+                if (line.startsWith("mark ")) {
+                    int idx = parseIndex(line.substring(5), "mark", size);
                     tasks[idx - 1].markAsDone();
-                    printBlock(
-                            "Nice! I've marked this task as done:",
-                            "  " + tasks[idx - 1].toString().replaceFirst("^\\[", "[") // keep formatting
-                    );
-                } catch (Exception e) {
-                    printBlock("Invalid index for mark.");
+                    printBlock("Nice! I've marked this task as done:", "  " + tasks[idx - 1]);
+                    continue;
                 }
-                continue;
-            }
-
-            if (input.startsWith("unmark ")) {
-                try {
-                    int idx = Integer.parseInt(input.substring(7).trim()); // 1-based
-                    if (idx < 1 || idx > size) throw new IndexOutOfBoundsException();
+                if (line.startsWith("unmark ")) {
+                    int idx = parseIndex(line.substring(7), "unmark", size);
                     tasks[idx - 1].markAsNotDone();
-                    printBlock(
-                            "OK, I've marked this task as not done yet:",
-                            "  " + tasks[idx - 1].toString()
-                    );
-                } catch (Exception e) {
-                    printBlock("Invalid index for unmark.");
+                    printBlock("OK, I've marked this task as not done yet:", "  " + tasks[idx - 1]);
+                    continue;
                 }
-                continue;
-            }
 
-            // Level-4: ToDos, Deadlines, Events
-            if (input.startsWith("todo ")) {
-                String desc = input.substring(5).trim();
-                Task t = new Todo(desc);
-                tasks[size++] = t;
-                printBlock(
-                        "Got it. I've added this task:",
-                        "  " + t.toString(),
-                        "Now you have " + size + " tasks in the list."
-                );
-                continue;
-            }
+                // Level-4: todo
+                if (line.equals("todo")) throw new EmptyDescriptionException("todo");
+                if (line.startsWith("todo ")) {
+                    String desc = need(line.substring(5), "todo");
+                    Task t = new Todo(desc);
+                    tasks[size++] = t;
+                    printBlock("Got it. I've added this task:", "  " + t, "Now you have " + size + " tasks in the list.");
+                    continue;
+                }
 
-            if (input.startsWith("deadline ")) {
-                String body = input.substring(9).trim();
-                // split around /by
-                String[] parts = body.split("\\s+/by\\s+", 2);
-                String desc = parts[0];
-                String by = parts.length > 1 ? parts[1] : "";
-                Task t = new Deadline(desc, by);
-                tasks[size++] = t;
-                printBlock(
-                        "Got it. I've added this task:",
-                        "  " + t.toString(),
-                        "Now you have " + size + " tasks in the list."
-                );
-                continue;
-            }
+                // Level-4: deadline
+                if (line.equals("deadline")) throw new EmptyDescriptionException("deadline");
+                if (line.startsWith("deadline ")) {
+                    String body = need(line.substring(9), "deadline");
+                    String[] parts = body.split("\\s+/by\\s+", 2);
+                    if (parts.length < 2) throw new MissingArgumentException("/by <time>");
+                    String desc = need(parts[0], "deadline");
+                    String by = need(parts[1], "/by <time>");
+                    Task t = new Deadline(desc, by);
+                    tasks[size++] = t;
+                    printBlock("Got it. I've added this task:", "  " + t, "Now you have " + size + " tasks in the list.");
+                    continue;
+                }
 
-            if (input.startsWith("event ")) {
-                String body = input.substring(6).trim();
-                // split around /from and /to
-                String[] p1 = body.split("\\s+/from\\s+", 2);
-                String desc = p1[0];
-                String from = "", to = "";
-                if (p1.length > 1) {
+                // Level-4: event
+                if (line.equals("event")) throw new EmptyDescriptionException("event");
+                if (line.startsWith("event ")) {
+                    String body = need(line.substring(6), "event");
+                    String[] p1 = body.split("\\s+/from\\s+", 2);
+                    if (p1.length < 2) throw new MissingArgumentException("/from <start>");
+                    String desc = need(p1[0], "event");
                     String[] p2 = p1[1].split("\\s+/to\\s+", 2);
-                    from = p2[0];
-                    to = (p2.length > 1) ? p2[1] : "";
+                    if (p2.length < 2) throw new MissingArgumentException("/to <end>");
+                    String from = need(p2[0], "/from <start>");
+                    String to = need(p2[1], "/to <end>");
+                    Task t = new Event(desc, from, to);
+                    tasks[size++] = t;
+                    printBlock("Got it. I've added this task:", "  " + t, "Now you have " + size + " tasks in the list.");
+                    continue;
                 }
-                Task t = new Event(desc, from, to);
-                tasks[size++] = t;
-                printBlock(
-                        "Got it. I've added this task:",
-                        "  " + t.toString(),
-                        "Now you have " + size + " tasks in the list."
-                );
-                continue;
-            }
 
-            // Fallback (optional): If user types plain text (pre-Level-4 style), treat it as a simple Todo
-            if (!input.isEmpty()) {
-                Task t = new Todo(input);
-                tasks[size++] = t;
-                printBlock(
-                        "Got it. I've added this task:",
-                        "  " + t.toString(),
-                        "Now you have " + size + " tasks in the list."
-                );
+                // Unknown command (Level-5 minimal)
+
+            } catch (QB7Exception e) {
+                // Friendly, specific error message block
+                printBlock("Uh oh! " + e.getMessage());
+            } catch (Exception e) {
+                // Safety net for unexpected bugs
+                printBlock("Something went wrong internally: " + e.getClass().getSimpleName());
             }
         }
     }
