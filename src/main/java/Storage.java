@@ -38,12 +38,13 @@ public class Storage {
                     }
                     case "D": {
                         String desc = p[2];
-                        String by = p[3];
+                        java.time.LocalDate by = java.time.LocalDate.parse(p[3]); // expects yyyy-MM-dd
                         Task t = new Deadline(desc, by);
                         if (done) t.markAsDone();
                         tasks.add(t);
                         break;
                     }
+
                     case "E": {
                         String desc = p[2];
                         String from = p[3];
@@ -80,7 +81,8 @@ public class Storage {
             return String.join(" | ", "T", done, t.description);
         } else if (t instanceof Deadline) {
             Deadline d = (Deadline) t;
-            return String.join(" | ", "D", done, d.description, d.by);
+            // write ISO format so we can parse reliably on load
+            return String.join(" | ", "D", done, d.description, d.by.toString());
         } else if (t instanceof Event) {
             Event e = (Event) t;
             return String.join(" | ", "E", done, e.description, e.from, e.to);

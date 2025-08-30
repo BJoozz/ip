@@ -20,6 +20,17 @@ public class QB7 {
         }
     }
 
+    private static java.time.LocalDate parseIsoDate(String s) throws QB7Exception {
+        String trimmed = need(s, "deadline date").trim();
+        // minimal: expect yyyy-MM-dd
+        try {
+            return java.time.LocalDate.parse(trimmed); // ISO yyyy-MM-dd
+        } catch (java.time.format.DateTimeParseException e) {
+            throw new MissingArgumentException("a valid date in yyyy-MM-dd (e.g., 2019-10-15)");
+        }
+    }
+
+
     private static String need(String s, String what) throws QB7Exception {
         if (s == null || s.trim().isEmpty()) throw new EmptyDescriptionException(what);
         return s.trim();
@@ -110,9 +121,9 @@ public class QB7 {
                 if (line.startsWith("deadline ")) {
                     String body = need(line.substring(9), "deadline");
                     String[] parts = body.split("\\s+/by\\s+", 2);
-                    if (parts.length < 2) throw new MissingArgumentException("/by <time>");
+                    if (parts.length < 2) throw new MissingArgumentException("/by <yyyy-MM-dd>");
                     String desc = need(parts[0], "deadline");
-                    String by = need(parts[1], "/by <time>");
+                    java.time.LocalDate by = parseIsoDate(parts[1]);
                     Task t = new Deadline(desc, by);
                     tasks.add(t);
                     storage.save(tasks);
@@ -120,6 +131,7 @@ public class QB7 {
                             "Now you have " + tasks.size() + " tasks in the list.");
                     continue;
                 }
+
 
                 // event
                 if (line.equals("event")) throw new EmptyDescriptionException("event");
