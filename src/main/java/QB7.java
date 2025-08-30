@@ -27,6 +27,14 @@ public class QB7 {
 
     public static void main(String[] args) {
         ArrayList<Task> tasks = new ArrayList<>(100);
+        Storage storage = new Storage();
+
+        // Load existing tasks, first run: empty list
+        try {
+            tasks = storage.load();
+        } catch (Exception e) {
+            tasks = new ArrayList<>();
+        }
 
         System.out.println(LINE);
         System.out.println(" Hello! I'm QB7");
@@ -43,7 +51,7 @@ public class QB7 {
             }
 
             try {
-                // list
+                // list (no save)
                 if (line.equals("list")) {
                     System.out.println(LINE);
                     System.out.println(" Here are the tasks in your list:");
@@ -54,24 +62,29 @@ public class QB7 {
                     continue;
                 }
 
-                // mark / unmark
+                // mark
                 if (line.startsWith("mark ")) {
                     int idx = parseIndex(line.substring(5), "mark", tasks.size());
                     tasks.get(idx - 1).markAsDone();
+                    storage.save(tasks);
                     printBlock("Nice! I've marked this task as done:", "  " + tasks.get(idx - 1));
                     continue;
                 }
+
+                // unmark
                 if (line.startsWith("unmark ")) {
                     int idx = parseIndex(line.substring(7), "unmark", tasks.size());
                     tasks.get(idx - 1).markAsNotDone();
+                    storage.save(tasks);
                     printBlock("OK, I've marked this task as not done yet:", "  " + tasks.get(idx - 1));
                     continue;
                 }
 
-                // NEW: delete
+                // delete
                 if (line.startsWith("delete ")) {
                     int idx = parseIndex(line.substring(7), "delete", tasks.size());
                     Task removed = tasks.remove(idx - 1);
+                    storage.save(tasks);
                     printBlock(
                             "Noted. I've removed this task:",
                             "  " + removed,
@@ -86,6 +99,7 @@ public class QB7 {
                     String desc = need(line.substring(5), "todo");
                     Task t = new Todo(desc);
                     tasks.add(t);
+                    storage.save(tasks);
                     printBlock("Got it. I've added this task:", "  " + t,
                             "Now you have " + tasks.size() + " tasks in the list.");
                     continue;
@@ -101,6 +115,7 @@ public class QB7 {
                     String by = need(parts[1], "/by <time>");
                     Task t = new Deadline(desc, by);
                     tasks.add(t);
+                    storage.save(tasks);
                     printBlock("Got it. I've added this task:", "  " + t,
                             "Now you have " + tasks.size() + " tasks in the list.");
                     continue;
@@ -119,12 +134,13 @@ public class QB7 {
                     String to = need(p2[1], "/to <end>");
                     Task t = new Event(desc, from, to);
                     tasks.add(t);
+                    storage.save(tasks);
                     printBlock("Got it. I've added this task:", "  " + t,
                             "Now you have " + tasks.size() + " tasks in the list.");
                     continue;
                 }
 
-                // unknown
+                // unknown command
                 if (!line.isEmpty()) throw new QB7Exception("I don't recognise the command: \"" + line + "\"");
 
             } catch (QB7Exception e) {
