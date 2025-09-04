@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Storage {
-    private final Path dir = Paths.get("data");          // relative, OS-independent
-    private final Path file = dir.resolve("qb7.txt");    // change name if you like
+    private final Path dir = Paths.get("data");
+    private final Path file = dir.resolve("jack.txt");
 
     /** Load tasks from data file. If file doesn't exist yet, return empty list. */
     public ArrayList<Task> load() throws IOException {
         ArrayList<Task> tasks = new ArrayList<>();
         if (!Files.exists(file)) {
-            return tasks; // first run: nothing to load
+            return tasks;
         }
         List<String> lines = Files.readAllLines(file, StandardCharsets.UTF_8);
         for (String raw : lines) {
@@ -38,7 +38,7 @@ public class Storage {
                     }
                     case "D": {
                         String desc = p[2];
-                        java.time.LocalDate by = java.time.LocalDate.parse(p[3]); // expects yyyy-MM-dd
+                        java.time.LocalDate by = java.time.LocalDate.parse(p[3]);   // expects yyyy-MM-dd
                         Task t = new Deadline(desc, by);
                         if (done) t.markAsDone();
                         tasks.add(t);
@@ -55,7 +55,6 @@ public class Storage {
                         break;
                     }
                     default:
-                        // unknown record → skip
                 }
             } catch (Exception ignored) {
                 // Stretch goal: detect & report corrupted lines.
