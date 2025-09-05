@@ -1,3 +1,7 @@
+package jack.ui;
+
+import jack.model.TaskList;
+
 import java.util.Scanner;
 
 public class Ui {
@@ -6,7 +10,7 @@ public class Ui {
 
     public void showWelcome() {
         System.out.println(LINE);
-        System.out.println(" Hello! I'm Jack");
+        System.out.println(" Hello! I'm jack.Jack");
         System.out.println(" What can I do for you?");
         System.out.println(LINE);
     }

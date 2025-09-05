@@ -1,14 +1,21 @@
+package jack;
+
+import jack.error.JackException;
+import jack.model.Storage;
+import jack.model.TaskList;
+import jack.ui.Ui;
+
 public class Jack {
     private final Storage storage;
     private TaskList tasks;
     private final Ui ui;
 
-    // default: use Storage() and ArrayList<Task>
+    // default: use jack.model.Storage() and ArrayList<jack.model.Task>
     public Jack() {
         ui = new Ui();
         storage = new Storage();
         try {
-            tasks = new TaskList(storage.load()); // Storage.load() returns ArrayList<Task>
+            tasks = new TaskList(storage.load()); // jack.model.Storage.load() returns ArrayList<jack.model.Task>
         } catch (Exception e) {
             ui.showLoadingError();
             tasks = new TaskList();

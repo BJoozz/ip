@@ -1,3 +1,12 @@
+package jack;
+
+import jack.error.EmptyDescriptionException;
+import jack.error.InvalidIndexException;
+import jack.error.JackException;
+import jack.error.MissingArgumentException;
+import jack.model.*;
+import jack.ui.Ui;
+
 import java.time.LocalDate;
 
 public class Parser {
