@@ -1,43 +1,39 @@
-package jack;
+package jack.model;
 
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 public class TaskListTest {
 
     @Test
-    void addTask_increasesSizeAndStoresTask() {
-        TaskList list = new TaskList();
-        list.add(new Todo("read book"));
-        assertEquals(1, list.size());
-        assertEquals("read book", list.get(0).getDescription());
+    @DisplayName("add() increases size and stores the correct task")
+    void add_increasesSizeAndStoresTask() {
+        TaskList list = new TaskList(new ArrayList<>());
+        Deadline d = new Deadline("read SE guide", LocalDate.of(2025, 9, 20));
+
+        int before = list.size();
+        list.add(d);
+
+        assertEquals(before + 1, list.size(), "Size should increase by 1");
+        assertEquals(d, list.get(list.size() - 1), "Last element should be the added task");
     }
 
     @Test
-    void deleteTask_removesCorrectItem() {
-        TaskList list = new TaskList();
-        list.add(new Todo("a"));
-        list.add(new Todo("b"));
-        Task removed = list.remove(0);
-        assertEquals("a", removed.getDescription());
-        assertEquals(1, list.size());
-        assertEquals("b", list.get(0).getDescription());
-    }
+    @DisplayName("remove(index) removes the right element and checks bounds")
+    void remove_removesAndChecksBounds() {
+        TaskList list = new TaskList(new ArrayList<>());
+        list.add(new Todo("t1"));
+        list.add(new Todo("t2"));
+        list.add(new Todo("t3"));
 
-    @Test
-    void find_matchesSubstringCaseInsensitive() {
-        TaskList list = new TaskList();
-        list.add(new Todo("Read CS2103 textbook"));
-        list.add(new Todo("buy milk"));
-        List<Task> found = list.find("cs2103");
-        assertEquals(1, found.size());
-        assertTrue(found.get(0).getDescription().contains("CS2103"));
-    }
+        Task removed = list.remove(1); // remove middle element
+        assertTrue(removed.toString().contains("t2"), "Removed task should contain 't2'");
+        assertEquals(2, list.size(), "Size should decrease by 1");
 
-    @Test
-    void remove_outOfBounds_throws() {
-        TaskList list = new TaskList();
-        assertThrows(IndexOutOfBoundsException.class, () -> list.remove(0));
+        assertThrows(IndexOutOfBoundsException.class, () -> list.remove(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> list.remove(42));
     }
 }

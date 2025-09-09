@@ -18,6 +18,5 @@ public class TaskList {
     public Task remove(int idx) { return tasks.remove(idx); }
     public List<Task> asList() { return Collections.unmodifiableList(tasks); }
 
-    /** For your current jack.model.Storage API (expects ArrayList<jack.model.Task>). */
     public ArrayList<Task> raw() { return tasks; }
 }
