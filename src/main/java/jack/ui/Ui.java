@@ -1,8 +1,8 @@
 package jack.ui;
 
-import jack.model.TaskList;
-
 import java.util.Scanner;
+
+import jack.model.TaskList;
 
 /**
  * Handles user interaction for the Jack application.
@@ -32,29 +32,39 @@ public class Ui {
      *
      * @return the next line of user input
      */
-    public String readCommand() { return sc.nextLine(); }
+    public String readCommand() {
+        return sc.nextLine();
+    }
 
     /**
      * Prints a horizontal line separator.
      */
-    public void showLine() { System.out.println(LINE); }
+    public void showLine() {
+        System.out.println(LINE);
+    }
 
     /**
      * Displays an error message indicating failure to load previous tasks.
      */
-    public void showLoadingError() { showBlock("Error loading previous tasks."); }
+    public void showLoadingError() {
+        showBlock("Error loading previous tasks.");
+    }
 
     /**
      * Displays a generic error message with the given details.
      *
      * @param msg error details
      */
-    public void showError(String msg) { showBlock("Uh oh! " + msg); }
+    public void showError(String msg) {
+        showBlock("Uh oh! " + msg);
+    }
 
     /**
      * Displays the program exit message.
      */
-    public void showExit() { showBlock("Bye. Hope to see you again soon!"); }
+    public void showExit() {
+        showBlock("Bye. Hope to see you again soon!");
+    }
 
     /**
      * Displays one or more lines of text as a block wrapped between horizontal lines.

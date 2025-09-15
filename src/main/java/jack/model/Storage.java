@@ -2,7 +2,11 @@ package jack.model;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,32 +54,32 @@ public class Storage {
                 String kind = p[0];
                 boolean done = "1".equals(p[1]);
                 switch (kind) {
-                    case "T": {
-                        String desc = p[2];
-                        Task t = new Todo(desc);
-                        if (done) t.markAsDone();
-                        tasks.add(t);
-                        break;
-                    }
-                    case "D": {
-                        String desc = p[2];
-                        java.time.LocalDate by = java.time.LocalDate.parse(p[3]);   // expects yyyy-MM-dd
-                        Task t = new Deadline(desc, by);
-                        if (done) t.markAsDone();
-                        tasks.add(t);
-                        break;
-                    }
+                case "T": {
+                    String desc = p[2];
+                    Task t = new Todo(desc);
+                    if (done) t.markAsDone();
+                    tasks.add(t);
+                    break;
+                }
+                case "D": {
+                    String desc = p[2];
+                    LocalDate by = LocalDate.parse(p[3]);   // expects yyyy-MM-dd
+                    Task t = new Deadline(desc, by);
+                    if (done) t.markAsDone();
+                    tasks.add(t);
+                    break;
+                }
 
-                    case "E": {
-                        String desc = p[2];
-                        String from = p[3];
-                        String to = p[4];
-                        Task t = new Event(desc, from, to);
-                        if (done) t.markAsDone();
-                        tasks.add(t);
-                        break;
-                    }
-                    default:
+                case "E": {
+                    String desc = p[2];
+                    String from = p[3];
+                    String to = p[4];
+                    Task t = new Event(desc, from, to);
+                    if (done) t.markAsDone();
+                    tasks.add(t);
+                    break;
+                }
+                default:
                 }
             } catch (Exception ignored) {
                 // Stretch goal: detect & report corrupted lines.

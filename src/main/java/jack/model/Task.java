@@ -39,12 +39,16 @@ public class Task {
     /**
      * Marks this task as done.
      */
-    public void markAsDone() { this.isDone = true; }
+    public void markAsDone() {
+        this.isDone = true;
+    }
 
     /**
      * Marks this task as not done.
      */
-    public void markAsNotDone() { this.isDone = false; }
+    public void markAsNotDone() {
+        this.isDone = false;
+    }
 
     /**
      * Returns the string representation of this task for display to the user.

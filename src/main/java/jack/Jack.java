@@ -29,6 +29,7 @@ public class Jack {
         }
     }
 
+
     /**
      * Creates a new {@code Jack} application instance.
      * <p>

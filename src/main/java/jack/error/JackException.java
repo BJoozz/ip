@@ -11,5 +11,7 @@ public class JackException extends Exception {
      *
      * @param msg explanation of the error
      */
-    public JackException(String msg) { super(msg); }
+    public JackException(String msg) {
+        super(msg);
+    }
 }
