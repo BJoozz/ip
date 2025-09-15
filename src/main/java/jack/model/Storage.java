@@ -6,11 +6,30 @@ import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Handles saving and loading of tasks to and from disk.
+ * <p>
+ * Tasks are stored in a text file {@code data/jack.txt} using a simple
+ * pipe-delimited format. Each line encodes one task, including its type,
+ * completion status, and description (plus additional fields for deadlines
+ * and events).
+ */
 public class Storage {
+    /** Directory used to store the data file. */
     private final Path dir = Paths.get("data");
+
+    /** File path for storing tasks. */
     private final Path file = dir.resolve("jack.txt");
 
-    /** Load tasks from data file. If file doesn't exist yet, return empty list. */
+    /**
+     * Loads tasks from the data file.
+     * <p>
+     * If the file does not exist, returns an empty list.
+     * Lines that cannot be parsed are ignored.
+     *
+     * @return list of tasks loaded from file
+     * @throws IOException if an I/O error occurs while reading the file
+     */
     public ArrayList<Task> load() throws IOException {
         ArrayList<Task> tasks = new ArrayList<>();
         if (!Files.exists(file)) {
@@ -65,7 +84,14 @@ public class Storage {
         return tasks;
     }
 
-    /** Save all tasks to data file, creating folder/file if needed. */
+    /**
+     * Saves all tasks to the data file, creating the folder/file if needed.
+     * <p>
+     * Existing file contents are replaced with the current list of tasks.
+     *
+     * @param tasks tasks to save
+     * @throws IOException if an I/O error occurs while writing the file
+     */
     public void save(ArrayList<Task> tasks) throws IOException {
         if (!Files.exists(dir)) Files.createDirectories(dir);
         List<String> out = new ArrayList<>();
@@ -76,6 +102,12 @@ public class Storage {
                 StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
+    /**
+     * Serializes a task into its encoded string form for persistence.
+     *
+     * @param t task to serialize
+     * @return pipe-delimited string representing the task
+     */
     private String serialize(Task t) {
         String done = t.isDone ? "1" : "0";
         if (t instanceof Todo) {

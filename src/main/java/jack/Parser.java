@@ -9,6 +9,12 @@ import jack.ui.Ui;
 
 import java.time.LocalDate;
 
+/**
+ * Parses raw user input and executes the corresponding commands.
+ * <p>
+ * Provides small parsing helpers (splitting tokens, validating indices, parsing dates)
+ * and a single entry point that dispatches a command to the application core.
+ */
 public class Parser {
     private static String[] splitOnce(String input) {
         String t = input.trim(); int sp = t.indexOf(' ');
@@ -16,9 +22,18 @@ public class Parser {
         return new String[]{t.substring(0, sp).toLowerCase(), t.substring(sp + 1)};
     }
 
-    private static int parseIndex(String s, String action, int size) throws JackException {
+    /**
+     * Parses a 1-based list index from user input and validates bounds.
+     *
+     * @param str      the raw index string
+     * @param action name of the action for error messages (e.g., {@code "delete"})
+     * @param size   current number of tasks in the list
+     * @return the parsed 1-based index
+     * @throws InvalidIndexException if the index is not a valid number or is out of bounds
+     */
+    private static int parseIndex(String str, String action, int size) throws JackException {
         try {
-            int idx = Integer.parseInt(s.trim());
+            int idx = Integer.parseInt(str.trim());
             if (idx < 1 || idx > size) throw new InvalidIndexException(action);
             return idx;
         } catch (NumberFormatException e) {
@@ -26,10 +41,27 @@ public class Parser {
         }
     }
 
+    /**
+     * Ensures that the given argument is non-null and non-blank.
+     *
+     * @param s    raw argument string
+     * @param what name of the argument for error messages
+     * @return trimmed argument string
+     * @throws EmptyDescriptionException if the argument is null or blank
+     */
     private static String need(String s, String what) throws JackException {
         if (s == null || s.trim().isEmpty()) throw new EmptyDescriptionException(what);
         return s.trim();
     }
+
+    /**
+     * Parses a date in ISO-8601 format ({@code yyyy-MM-dd}).
+     *
+     * @param s date string to parse
+     * @return parsed {@link LocalDate}
+     * @throws MissingArgumentException if the string is not a valid ISO date
+     */
+
     private static LocalDate parseIsoDate(String s) throws JackException {
         String trimmed = need(s, "deadline date").trim();
         try { return LocalDate.parse(trimmed); }
@@ -38,7 +70,16 @@ public class Parser {
         }
     }
 
-    /** Handle one input line. Return true to exit. */
+    /**
+     * Parses and executes a single user command.
+     *
+     * @param fullCommand full input line from the user (e.g., {@code "todo read book"})
+     * @param tasks       the in-memory task list to read and modify
+     * @param ui          UI helper for producing user-facing messages
+     * @param storage     persistent storage used to save task list updates
+     * @return {@code true} if the command requests program termination (e.g., {@code "bye"}); {@code false} otherwise
+     * @throws JackException if the command is unknown or required arguments are missing/invalid
+     */
     public static boolean dispatch(String fullCommand, TaskList tasks, Ui ui, Storage storage) throws JackException {
         String[] parts = splitOnce(fullCommand);
         String cmd = parts[0], args = parts[1];
