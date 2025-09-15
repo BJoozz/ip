@@ -4,13 +4,20 @@ import jack.error.JackException;
 import jack.model.Storage;
 import jack.model.TaskList;
 import jack.ui.Ui;
-
+/**
+ * Entry point of the Jack task manager application.
+ * <p>
+ * Wires together the {@code Storage}, {@code TaskList}, and {@code Ui} components,
+ * loads existing tasks from disk, and runs the main event loop.
+ */
 public class Jack {
     private final Storage storage;
     private TaskList tasks;
     private final Ui ui;
 
-    // default: use jack.model.Storage() and ArrayList<jack.model.Task>
+    /**
+     * Creates a new {@code Jack} application instance.
+     */
     public Jack() {
         ui = new Ui();
         storage = new Storage();
@@ -22,9 +29,20 @@ public class Jack {
         }
     }
 
-    // keep old signature for compatibility (ignored path)
+
+    /**
+     * Creates a new {@code Jack} application instance.
+     * <p>
+     * This constructor ignores the provided file path and delegates
+     * to the default constructor.
+     *
+     * @param ignoredFilePath unused file path argument
+     */
     public Jack(String ignoredFilePath) { this(); }
 
+    /**
+     * Runs the main event loop until an exit command is received.
+     */
     public void run() {
         ui.showWelcome();
         boolean isExit = false;
@@ -43,6 +61,11 @@ public class Jack {
         }
     }
 
+    /**
+     * Starts the application.
+     *
+     * @param args command-line arguments (unused)
+     */
     public static void main(String[] args) {
         new Jack().run();
     }

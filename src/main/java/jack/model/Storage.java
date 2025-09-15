@@ -2,15 +2,38 @@ package jack.model;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Handles saving and loading of tasks to and from disk.
+ * <p>
+ * Tasks are stored in a text file {@code data/jack.txt} using a simple
+ * pipe-delimited format. Each line encodes one task, including its type,
+ * completion status, and description (plus additional fields for deadlines
+ * and events).
+ */
 public class Storage {
+    /** Directory used to store the data file. */
     private final Path dir = Paths.get("data");
+
+    /** File path for storing tasks. */
     private final Path file = dir.resolve("jack.txt");
 
-    /** Load tasks from data file. If file doesn't exist yet, return empty list. */
+    /**
+     * Loads tasks from the data file.
+     * <p>
+     * If the file does not exist, returns an empty list.
+     * Lines that cannot be parsed are ignored.
+     *
+     * @return list of tasks loaded from file
+     * @throws IOException if an I/O error occurs while reading the file
+     */
     public ArrayList<Task> load() throws IOException {
         ArrayList<Task> tasks = new ArrayList<>();
         if (!Files.exists(file)) {
@@ -31,32 +54,32 @@ public class Storage {
                 String kind = p[0];
                 boolean done = "1".equals(p[1]);
                 switch (kind) {
-                    case "T": {
-                        String desc = p[2];
-                        Task t = new Todo(desc);
-                        if (done) t.markAsDone();
-                        tasks.add(t);
-                        break;
-                    }
-                    case "D": {
-                        String desc = p[2];
-                        java.time.LocalDate by = java.time.LocalDate.parse(p[3]);   // expects yyyy-MM-dd
-                        Task t = new Deadline(desc, by);
-                        if (done) t.markAsDone();
-                        tasks.add(t);
-                        break;
-                    }
+                case "T": {
+                    String desc = p[2];
+                    Task t = new Todo(desc);
+                    if (done) t.markAsDone();
+                    tasks.add(t);
+                    break;
+                }
+                case "D": {
+                    String desc = p[2];
+                    LocalDate by = LocalDate.parse(p[3]);   // expects yyyy-MM-dd
+                    Task t = new Deadline(desc, by);
+                    if (done) t.markAsDone();
+                    tasks.add(t);
+                    break;
+                }
 
-                    case "E": {
-                        String desc = p[2];
-                        String from = p[3];
-                        String to = p[4];
-                        Task t = new Event(desc, from, to);
-                        if (done) t.markAsDone();
-                        tasks.add(t);
-                        break;
-                    }
-                    default:
+                case "E": {
+                    String desc = p[2];
+                    String from = p[3];
+                    String to = p[4];
+                    Task t = new Event(desc, from, to);
+                    if (done) t.markAsDone();
+                    tasks.add(t);
+                    break;
+                }
+                default:
                 }
             } catch (Exception ignored) {
                 // Stretch goal: detect & report corrupted lines.
@@ -65,7 +88,14 @@ public class Storage {
         return tasks;
     }
 
-    /** Save all tasks to data file, creating folder/file if needed. */
+    /**
+     * Saves all tasks to the data file, creating the folder/file if needed.
+     * <p>
+     * Existing file contents are replaced with the current list of tasks.
+     *
+     * @param tasks tasks to save
+     * @throws IOException if an I/O error occurs while writing the file
+     */
     public void save(ArrayList<Task> tasks) throws IOException {
         if (!Files.exists(dir)) Files.createDirectories(dir);
         List<String> out = new ArrayList<>();
@@ -76,6 +106,12 @@ public class Storage {
                 StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
+    /**
+     * Serializes a task into its encoded string form for persistence.
+     *
+     * @param t task to serialize
+     * @return pipe-delimited string representing the task
+     */
     private String serialize(Task t) {
         String done = t.isDone ? "1" : "0";
         if (t instanceof Todo) {
