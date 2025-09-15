@@ -23,7 +23,9 @@ public class Jack {
     }
 
     // keep old signature for compatibility (ignored path)
-    public Jack(String ignoredFilePath) { this(); }
+    public Jack(String ignoredFilePath) {
+        this();
+    }
 
     public void run() {
         ui.showWelcome();

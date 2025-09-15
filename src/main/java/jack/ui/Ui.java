@@ -1,8 +1,8 @@
 package jack.ui;
 
-import jack.model.TaskList;
-
 import java.util.Scanner;
+
+import jack.model.TaskList;
 
 public class Ui {
     private static final String LINE = "____________________________________________________________";
@@ -15,11 +15,25 @@ public class Ui {
         System.out.println(LINE);
     }
 
-    public String readCommand() { return sc.nextLine(); }
-    public void showLine() { System.out.println(LINE); }
-    public void showLoadingError() { showBlock("Error loading previous tasks."); }
-    public void showError(String msg) { showBlock("Uh oh! " + msg); }
-    public void showExit() { showBlock("Bye. Hope to see you again soon!"); }
+    public String readCommand() {
+        return sc.nextLine();
+    }
+
+    public void showLine() {
+        System.out.println(LINE);
+    }
+
+    public void showLoadingError() {
+        showBlock("Error loading previous tasks.");
+    }
+
+    public void showError(String msg) {
+        showBlock("Uh oh! " + msg);
+    }
+
+    public void showExit() {
+        showBlock("Bye. Hope to see you again soon!");
+    }
 
     public void showBlock(String... lines) {
         System.out.println(LINE);
