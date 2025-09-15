@@ -26,7 +26,21 @@ public class Task {
         this.isDone = false;
         this.type = type;
     }
-
+    
+    /**
+     * Checks if the task's description contains the given keyword.
+     *
+     * @param keyword the word to search for
+     * @return true if the description is not null and contains the keyword
+     *         (case-insensitive), false otherwise
+     */
+    public boolean matches(String keyword) {
+        if (description == null) {
+            return false;
+        }
+        return description.toLowerCase().contains(keyword.toLowerCase());
+    }
+  
     /**
      * Returns the status icon of this task.
      *

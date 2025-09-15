@@ -174,6 +174,12 @@ public class Parser {
                     "Now you have " + tasks.size() + " tasks in the list.");
             return false;
         }
+        case "find": {
+            String keyword = need(args, "search keyword");
+            String result = tasks.findTasks(keyword);
+            ui.showBlock(result);
+            return false;
+        }
 
         default:
             if (!fullCommand.trim().isEmpty())
