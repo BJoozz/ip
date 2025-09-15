@@ -11,11 +11,18 @@ public class Task {
         this.type = type;
     }
 
+    public boolean matches(String keyword) {
+        if (description == null) {
+            return false;
+        }
+        return description.toLowerCase().contains(keyword.toLowerCase());
+    }
     public String getStatusIcon() {
         return (isDone ? "X" : " ");
     }
 
     public void markAsDone() { this.isDone = true; }
+
     public void markAsNotDone() { this.isDone = false; }
 
     @Override
