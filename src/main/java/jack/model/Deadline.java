@@ -11,12 +11,12 @@ import java.time.format.DateTimeFormatter;
  */
 
 public class Deadline extends Task {
-    /** Date by which the task must be completed. */
-    protected LocalDate by;
-
     /** Formatter used for displaying the deadline date. */
     private static final DateTimeFormatter OUT_FMT =
             DateTimeFormatter.ofPattern("MMM d yyyy"); // e.g., Oct 15 2019
+
+    /** Date by which the task must be completed. */
+    protected LocalDate by;
 
     /**
      * Creates a new {@code Deadline} task.

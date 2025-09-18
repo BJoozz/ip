@@ -38,7 +38,9 @@ public class Jack {
      *
      * @param ignoredFilePath unused file path argument
      */
-    public Jack(String ignoredFilePath) { this(); }
+    public Jack(String ignoredFilePath) {
+        this();
+    }
 
     /**
      * Runs the main event loop until an exit command is received.
