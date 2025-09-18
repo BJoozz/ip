@@ -41,9 +41,13 @@ public class Storage {
         }
         List<String> lines = Files.readAllLines(file, StandardCharsets.UTF_8);
         for (String raw : lines) {
-            if (raw == null) continue;
+            if (raw == null) {
+                continue;
+            }
             String line = raw.trim();
-            if (line.isEmpty()) continue;
+            if (line.isEmpty()) {
+                continue;
+            }
 
             // Formats we write:
             // T | 1 | read book
@@ -57,15 +61,19 @@ public class Storage {
                 case "T": {
                     String desc = p[2];
                     Task t = new Todo(desc);
-                    if (done) t.markAsDone();
+                    if (done) {
+                        t.markAsDone();
+                    }
                     tasks.add(t);
                     break;
                 }
                 case "D": {
                     String desc = p[2];
-                    LocalDate by = LocalDate.parse(p[3]);   // expects yyyy-MM-dd
+                    LocalDate by = LocalDate.parse(p[3]); // expects yyyy-MM-dd
                     Task t = new Deadline(desc, by);
-                    if (done) t.markAsDone();
+                    if (done) {
+                        t.markAsDone();
+                    }
                     tasks.add(t);
                     break;
                 }
@@ -75,7 +83,9 @@ public class Storage {
                     String from = p[3];
                     String to = p[4];
                     Task t = new Event(desc, from, to);
-                    if (done) t.markAsDone();
+                    if (done) {
+                        t.markAsDone();
+                    }
                     tasks.add(t);
                     break;
                 }
@@ -97,7 +107,9 @@ public class Storage {
      * @throws IOException if an I/O error occurs while writing the file
      */
     public void save(ArrayList<Task> tasks) throws IOException {
-        if (!Files.exists(dir)) Files.createDirectories(dir);
+        if (!Files.exists(dir)) {
+            Files.createDirectories(dir);
+        }
         List<String> out = new ArrayList<>();
         for (Task t : tasks) {
             out.add(serialize(t));

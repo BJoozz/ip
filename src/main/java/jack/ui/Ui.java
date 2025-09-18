@@ -73,7 +73,9 @@ public class Ui {
      */
     public void showBlock(String... lines) {
         System.out.println(LINE);
-        for (String s : lines) System.out.println(" " + s);
+        for (String s : lines) {
+            System.out.println(" " + s);
+        }
         System.out.println(LINE);
     }
 

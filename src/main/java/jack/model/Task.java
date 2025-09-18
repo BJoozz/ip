@@ -26,7 +26,7 @@ public class Task {
         this.isDone = false;
         this.type = type;
     }
-    
+
     /**
      * Checks if the task's description contains the given keyword.
      *
@@ -40,7 +40,7 @@ public class Task {
         }
         return description.toLowerCase().contains(keyword.toLowerCase());
     }
-  
+
     /**
      * Returns the status icon of this task.
      *

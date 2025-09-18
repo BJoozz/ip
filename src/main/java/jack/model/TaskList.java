@@ -31,6 +31,14 @@ public class TaskList {
     public TaskList(ArrayList<Task> fromStorage) {
         this.tasks = (fromStorage == null) ? new ArrayList<>() : fromStorage;
     }
+
+    /**
+     * Finds tasks in the list that match the given keyword.
+     * Returns a formatted string of the matching tasks, or a message if none are found.
+     *
+     * @param keyword the search keyword
+     * @return a string containing matching tasks or a message if no matches
+     */
     public String findTasks(String keyword) {
         StringBuilder sb = new StringBuilder("Here are the matching tasks in your list:\n");
         int shown = 0;
@@ -86,7 +94,7 @@ public class TaskList {
     public Task remove(int idx) {
         return tasks.remove(idx);
     }
-  
+
     /**
      * Returns an unmodifiable view of the task list.
      *
