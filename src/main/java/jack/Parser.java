@@ -26,12 +26,15 @@ public class Parser {
     private static final Pattern FROM_TOKEN = Pattern.compile("\\s+/from\\s+");
     private static final Pattern TO_TOKEN   = Pattern.compile("\\s+/to\\s+");
     private static String[] splitOnce(String input) {
+        assert input != null : "splitOnce: input must not be null";
         String t = input.trim();
         int sp = t.indexOf(' ');
         if (sp < 0) {
             return new String[]{t.toLowerCase(), ""};
         }
-        return new String[]{t.substring(0, sp).toLowerCase(), t.substring(sp + 1)};
+        String[] out = new String[]{t.substring(0, sp).toLowerCase(), t.substring(sp + 1)};
+        assert out[0] != null && out[1] != null : "splitOnce must not yield null parts";
+        return out;
     }
 
     /**
@@ -44,6 +47,8 @@ public class Parser {
      * @throws InvalidIndexException if the index is not a valid number or is out of bounds
      */
     private static int parseIndex(String str, String action, int size) throws JackException {
+        assert action != null && !action.isBlank() : "parseIndex: action label must be non-blank";
+        assert size >= 0 : "parseIndex: size must be non-negative";
         try {
             int idx = Integer.parseInt(str.trim());
             if (idx < 1 || idx > size) {
@@ -64,6 +69,7 @@ public class Parser {
      * @throws EmptyDescriptionException if the argument is null or blank
      */
     private static String need(String s, String what) throws JackException {
+        assert what != null && !what.isBlank() : "need: 'what' label must be provided";
         if (s == null || s.trim().isEmpty()) {
             throw new EmptyDescriptionException(what);
         }
@@ -111,6 +117,11 @@ public class Parser {
      * @throws JackException if the command is unknown or required arguments are missing/invalid
      */
     public static boolean dispatch(String fullCommand, TaskList tasks, Ui ui, Storage storage) throws JackException {
+        assert tasks != null : "dispatch: tasks must not be null";
+        assert ui != null : "dispatch: ui must not be null";
+        assert storage != null : "dispatch: storage must not be null";
+        assert fullCommand != null : "dispatch: fullCommand must not be null";
+
         String[] parts = splitOnce(fullCommand);
         String cmd = parts[0];
         String args = parts[1];
