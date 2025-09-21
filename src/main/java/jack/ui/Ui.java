@@ -17,14 +17,43 @@ public class Ui {
     /** Scanner used to read input from standard input. */
     private final Scanner sc = new Scanner(System.in);
 
+    private final boolean captureMode;
+    private final StringBuilder buffer;
+
+    /** CLI mode (prints to console). */
+    public Ui() {
+        this(false);
+    }
+
+    /** If captureMode is true, output is captured and retrievable via getCaptured(). */
+    public Ui(boolean captureMode) {
+        this.captureMode = captureMode;
+        this.buffer = captureMode ? new StringBuilder() : null;
+    }
+
+    private void raw(String s) {
+        if (captureMode) {
+            buffer.append(s).append(System.lineSeparator());
+        } else {
+            System.out.println(s);
+        }
+    }
+
+    /** Gets captured text (GUI mode). */
+    public String getCaptured() {
+        String out = buffer.toString().trim();
+        buffer.setLength(0); // clear the buffer for next use
+        return out;
+    }
+
     /**
      * Displays the welcome message at program startup.
      */
     public void showWelcome() {
-        System.out.println(LINE);
-        System.out.println(" Hello! I'm Jack");
-        System.out.println(" What can I do for you?");
-        System.out.println(LINE);
+        showLine();
+        raw(" Hello! I'm Jack");
+        raw(" What can I do for you?");
+        showLine();
     }
 
     /**
@@ -40,7 +69,9 @@ public class Ui {
      * Prints a horizontal line separator.
      */
     public void showLine() {
-        System.out.println(LINE);
+        if (!captureMode) {
+            System.out.println(LINE);
+        }
     }
 
     /**
@@ -72,11 +103,11 @@ public class Ui {
      * @param lines lines of text to display
      */
     public void showBlock(String... lines) {
-        System.out.println(LINE);
+        showLine();
         for (String s : lines) {
-            System.out.println(" " + s);
+            raw(" " + s);
         }
-        System.out.println(LINE);
+        showLine();
     }
 
     /**
@@ -85,11 +116,11 @@ public class Ui {
      * @param tasks task list to display
      */
     public void showList(TaskList tasks) {
-        System.out.println(LINE);
-        System.out.println(" Here are the tasks in your list:");
+        showLine();
+        raw(" Here are the tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
-            System.out.println(" " + (i + 1) + "." + tasks.get(i));
+            raw(" " + (i + 1) + "." + tasks.get(i));
         }
-        System.out.println(LINE);
+        showLine();
     }
 }
