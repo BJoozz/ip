@@ -1,5 +1,7 @@
 package jack;
 
+import jack.util.NaturalDates;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.regex.Pattern;
 
@@ -78,18 +80,21 @@ public class Parser {
 
 
     /**
-     * Parses a date in ISO-8601 format ({@code yyyy-MM-dd}).
+     * Parses a date string, supporting both ISO formats and natural dates.
      *
      * @param s date string to parse
      * @return parsed {@link LocalDate}
-     * @throws MissingArgumentException if the string is not a valid ISO date
+     * @throws MissingArgumentException if the string is not a valid date
      */
-    private static LocalDate parseIsoDate(String s) throws JackException {
-        String trimmed = need(s, "deadline date").trim();
+    private static LocalDate parseNaturalDate(String s) throws JackException {
+        final String input = need(s, "deadline date");
         try {
-            return LocalDate.parse(trimmed);
-        } catch (java.time.format.DateTimeParseException e) {
-            throw new MissingArgumentException("a valid date in yyyy-mm-dd (e.g., 2019-10-15)");
+            LocalDate today = LocalDate.now(Clock.systemDefaultZone());
+            return NaturalDates.parse(input, today);
+        } catch (IllegalArgumentException e) {
+            throw new MissingArgumentException(
+                    "a valid date (e.g., 2025-10-01, 1 Oct 2025, today, next Mon, in 2 days)"
+            );
         }
     }
 
@@ -179,7 +184,7 @@ public class Parser {
             if (p.length < 2) {
                 throw new MissingArgumentException("/by <yyyy-MM-dd>");
             }
-            Task t = new Deadline(need(p[0], "deadline"), parseIsoDate(p[1]));
+            Task t = new Deadline(need(p[0], "deadline"), parseNaturalDate(p[1]));
             tasks.add(t);
             persist(tasks, storage);
             confirmAdd(ui, tasks, t);
