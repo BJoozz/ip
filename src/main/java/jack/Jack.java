@@ -14,12 +14,11 @@ public class Jack {
     private final Storage storage;
     private TaskList tasks;
     private final Ui ui;
-
     /**
      * Creates a new {@code Jack} application instance.
      */
-    public Jack() {
-        ui = new Ui();
+    public Jack(boolean isGui) {
+        ui = new Ui(isGui);
         storage = new Storage();
         try {
             tasks = new TaskList(storage.load()); // jack.model.Storage.load() returns ArrayList<jack.model.Task>
@@ -27,6 +26,9 @@ public class Jack {
             ui.showLoadingError();
             tasks = new TaskList();
         }
+    }
+    public Jack() {
+        this(false);
     }
 
 
@@ -70,5 +72,29 @@ public class Jack {
      */
     public static void main(String[] args) {
         new Jack().run();
+    }
+
+    /**
+     * Generates a response for the user's chat message.
+     */
+    public String getResponse(String input) {
+        try {
+            boolean isExit = Parser.dispatch(input, tasks, ui, storage);
+            if (isExit) {
+                // Extra safeguard: Platform.exit() closes JavaFX window
+                javafx.application.Platform.exit();
+            }
+            String out = ui.getCaptured();
+            return out.isEmpty() ? "(no output)" : out;
+        } catch (JackException e) {
+            return e.getMessage();
+        } catch (Exception e) {
+            return "Something went wrong internally: " + e.getClass().getSimpleName();
+        }
+    }
+
+    public String getWelcomeMessage() {
+        ui.showWelcome();
+        return ui.getCaptured();
     }
 }
