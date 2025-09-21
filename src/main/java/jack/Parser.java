@@ -1,6 +1,7 @@
 package jack;
 
 import java.time.LocalDate;
+import java.util.regex.Pattern;
 
 import jack.error.EmptyDescriptionException;
 import jack.error.InvalidIndexException;
@@ -21,6 +22,9 @@ import jack.ui.Ui;
  * and a single entry point that dispatches a command to the application core.
  */
 public class Parser {
+    private static final Pattern BY_TOKEN   = Pattern.compile("\\s+/by\\s+");
+    private static final Pattern FROM_TOKEN = Pattern.compile("\\s+/from\\s+");
+    private static final Pattern TO_TOKEN   = Pattern.compile("\\s+/to\\s+");
     private static String[] splitOnce(String input) {
         assert input != null : "splitOnce: input must not be null";
         String t = input.trim();
@@ -85,8 +89,21 @@ public class Parser {
         try {
             return LocalDate.parse(trimmed);
         } catch (java.time.format.DateTimeParseException e) {
-            throw new MissingArgumentException("a valid date in yyyy-MM-dd (e.g., 2019-10-15)");
+            throw new MissingArgumentException("a valid date in yyyy-mm-dd (e.g., 2019-10-15)");
         }
+    }
+
+    private static void persist(TaskList tasks, Storage storage) {
+        try {
+            storage.save(tasks.raw());
+        } catch (Exception ignored) {
+            // Intentionally ignored because saving failure is non-critical
+        }
+    }
+
+    private static void confirmAdd(Ui ui, TaskList tasks, Task t) {
+        ui.showBlock("Got it. I've added this task:", "  " + t,
+                "Now you have " + tasks.size() + " tasks in the list.");
     }
 
     /**
@@ -131,22 +148,14 @@ public class Parser {
         case "unmark": {
             int idx = parseIndex(args, "unmark", tasks.size());
             tasks.get(idx - 1).markAsNotDone();
-            try {
-                storage.save(tasks.raw());
-            } catch (Exception ignored) {
-                // Intentionally ignored because saving failure is non-critical
-            }
+            persist(tasks, storage);
             ui.showBlock("OK, I've marked this task as not done yet:", "  " + tasks.get(idx - 1));
             return false;
         }
         case "delete": {
             int idx = parseIndex(args, "delete", tasks.size());
             Task removed = tasks.remove(idx - 1);
-            try {
-                storage.save(tasks.raw());
-            } catch (Exception ignored) {
-                // Intentionally ignored because saving failure is non-critical
-            }
+            persist(tasks, storage);
             ui.showBlock("Noted. I've removed this task:",
                     "  " + removed,
                     "Now you have " + tasks.size() + " tasks in the list.");
@@ -158,32 +167,22 @@ public class Parser {
             }
             Task t = new Todo(need(args, "todo"));
             tasks.add(t);
-            try {
-                storage.save(tasks.raw());
-            } catch (Exception ignored) {
-                // Intentionally ignored because saving failure is non-critical
-            }
-            ui.showBlock("Got it. I've added this task:", "  " + t,
-                    "Now you have " + tasks.size() + " tasks in the list.");
+            persist(tasks, storage);
+            confirmAdd(ui, tasks, t);
             return false;
         }
         case "deadline": {
             if (args.isEmpty()) {
                 throw new EmptyDescriptionException("deadline");
             }
-            String[] p = need(args, "deadline").split("\\s+/by\\s+", 2);
+            String[] p = BY_TOKEN.split(need(args, "deadline"), 2);
             if (p.length < 2) {
                 throw new MissingArgumentException("/by <yyyy-MM-dd>");
             }
             Task t = new Deadline(need(p[0], "deadline"), parseIsoDate(p[1]));
             tasks.add(t);
-            try {
-                storage.save(tasks.raw());
-            } catch (Exception ignored) {
-                // Intentionally ignored because saving failure is non-critical
-            }
-            ui.showBlock("Got it. I've added this task:", "  " + t,
-                    "Now you have " + tasks.size() + " tasks in the list.");
+            persist(tasks, storage);
+            confirmAdd(ui, tasks, t);
             return false;
         }
         case "event": {
@@ -191,23 +190,18 @@ public class Parser {
                 throw new EmptyDescriptionException("event");
             }
             String body = need(args, "event");
-            String[] p1 = body.split("\\s+/from\\s+", 2);
+            final String[] p1 = FROM_TOKEN.split(body, 2);
             if (p1.length < 2) {
                 throw new MissingArgumentException("/from <start>");
             }
-            String[] p2 = p1[1].split("\\s+/to\\s+", 2);
+            final String[] p2 = TO_TOKEN.split(p1[1], 2);
             if (p2.length < 2) {
                 throw new MissingArgumentException("/to <end>");
             }
             Task t = new Event(need(p1[0], "event"), need(p2[0], "/from <start>"), need(p2[1], "/to <end>"));
             tasks.add(t);
-            try {
-                storage.save(tasks.raw());
-            } catch (Exception ignored) {
-                // Intentionally ignored because saving failure is non-critical
-            }
-            ui.showBlock("Got it. I've added this task:", "  " + t,
-                    "Now you have " + tasks.size() + " tasks in the list.");
+            persist(tasks, storage);
+            confirmAdd(ui, tasks, t);
             return false;
         }
         case "find": {
