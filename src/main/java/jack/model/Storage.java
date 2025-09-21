@@ -35,11 +35,14 @@ public class Storage {
      * @throws IOException if an I/O error occurs while reading the file
      */
     public ArrayList<Task> load() throws IOException {
+        assert dir != null && file != null : "Storage paths must be initialized";
         ArrayList<Task> tasks = new ArrayList<>();
         if (!Files.exists(file)) {
             return tasks;
         }
         List<String> lines = Files.readAllLines(file, StandardCharsets.UTF_8);
+        assert lines != null : "readAllLines should not return null";
+
         for (String raw : lines) {
             if (raw == null) {
                 continue;

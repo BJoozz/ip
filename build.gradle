@@ -50,6 +50,13 @@ test {
 application {
     //mainClass.set("jack.Jack")
     mainClass.set("jack.Launcher")
+    // Ensure assertions are ON when running via Gradle
+    applicationDefaultJvmArgs = ["-ea"]
+}
+
+tasks.withType(Test).configureEach {
+    // Ensure assertions are ON in tests too
+    jvmArgs "-ea"
 }
 
 shadowJar {

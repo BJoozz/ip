@@ -30,6 +30,7 @@ public class TaskList {
      */
     public TaskList(ArrayList<Task> fromStorage) {
         this.tasks = (fromStorage == null) ? new ArrayList<>() : fromStorage;
+        assert this.tasks != null : "TaskList: tasks list must be initialized";
     }
 
     /**
@@ -40,6 +41,7 @@ public class TaskList {
      * @return a string containing matching tasks or a message if no matches
      */
     public String findTasks(String keyword) {
+        assert keyword != null : "findTasks: keyword must not be null";
         StringBuilder sb = new StringBuilder("Here are the matching tasks in your list:\n");
         int shown = 0;
         for (int i = 0; i < tasks.size(); i++) {
