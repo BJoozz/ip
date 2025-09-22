@@ -1,26 +1,174 @@
-# Duke project template
+# Jack User Guide
 
-This is a project template for a greenfield Java project. It's named after the Java mascot _Duke_. Given below are instructions on how to use it.
+![Ui](docs/Ui.png)
 
-## Setting up in Intellij
+Jack is a chatbot that helps you manage your tasks.  
+This User Guide will show you how to install and use Jack.
 
-Prerequisites: JDK 17, update Intellij to the most recent version.
+---
 
-1. Open Intellij (if you are not in the welcome screen, click `File` > `Close Project` to close the existing project first)
-1. Open the project into Intellij as follows:
-   1. Click `Open`.
-   1. Select the project directory, and click `OK`.
-   1. If there are any further prompts, accept the defaults.
-1. Configure the project to use **JDK 17** (not other versions) as explained in [here](https://www.jetbrains.com/help/idea/sdk.html#set-up-jdk).<br>
-   In the same dialog, set the **Project language level** field to the `SDK default` option.
-1. After that, locate the `src/main/java/Duke.java` file, right-click it, and choose `Run Duke.main()` (if the code editor is showing compile errors, try restarting the IDE). If the setup is correct, you should see something like the below as the output:
+## Quick Start
+1. Ensure you have Java 11 installed.
+2. Download the latest `jack.jar` from [releases](../../releases).
+3. Run the program with:
+   ```bash
+   java -jar jack.jar
    ```
-   Hello from
-    ____        _        
-   |  _ \ _   _| | _____ 
-   | | | | | | | |/ / _ \
-   | |_| | |_| |   <  __/
-   |____/ \__,_|_|\_\___|
-   ```
+4. Type a command in the input box and press Enter.
 
-**Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+5. Indexes shown in examples below are 1-based (the first task is index 1).
+
+---
+
+## Features
+### Add a To-do
+**Format:**  
+`todo DESCRIPTION`
+
+Adds a basic task with just a description.
+
+**Example**
+```
+todo read book
+```
+
+**What you’ll see**
+```
+Got it. I've added this task:
+  [T][ ] read book
+Now you have N tasks in the list.
+```
+
+---
+
+### Add a Deadline (supports natural dates)
+**Format:**  
+`deadline DESCRIPTION /by DATE`
+
+`DATE` accepts ISO or natural expressions (see **Natural dates** below).
+
+**Examples**
+```
+deadline submit report /by 2025-10-01
+deadline return book /by 1 Oct 2025
+deadline pay fees /by today
+deadline schedule checkup /by next Mon
+deadline send slides /by in 2 days
+```
+
+---
+
+### Add an Event
+**Format:**  
+`event DESCRIPTION /from START /to END`
+
+Free-form `START`/`END` text is accepted (e.g., `Aug 6 2pm`, `4pm`, `tomorrow 3pm`, etc.).
+
+**Example**
+```
+event project meeting /from Aug 6 2pm /to 4pm
+```
+
+---
+
+### List Tasks
+**Format:**  
+`list`
+
+Shows all current tasks in the task list.
+
+**Example**
+```
+list
+```
+
+
+---
+
+### Delete a Task
+**Format:**  
+`delete INDEX`
+
+Removes the task at the given index.
+
+**Example**
+```
+delete 3
+```
+
+**What you’ll see**
+```
+Noted. I've removed this task:
+  [D][ ] submit report (by: Oct 1 2025)
+Now you have N tasks in the list.
+```
+
+---
+
+### Mark a Task as Done
+**Format:**  
+`mark INDEX`
+
+**Example**
+```
+mark 2
+```
+
+**What you’ll see**
+```
+Nice! I've marked this task as done:
+  [T][X] read book
+```
+
+---
+
+### Mark a Task as Not Done
+**Format:**  
+`unmark INDEX`
+
+**Example**
+```
+unmark 2
+```
+
+**What you’ll see**
+```
+OK, I've marked this task as not done yet:
+  [T][ ] read book
+```
+
+---
+
+### Find Tasks
+**Format:**  
+`find KEYWORD`
+
+Shows tasks whose description contains the keyword (case-insensitive).
+
+**Examples**
+```
+find book
+find report
+```
+
+---
+
+### Exit the Program
+**Format:**  
+`bye`
+
+Closes the application.
+
+
+---
+
+## Command Summary
+- `todo DESCRIPTION`
+- `deadline DESCRIPTION /by DATE`
+- `event DESCRIPTION /from START /to END`
+- `list`
+- `mark INDEX`
+- `unmark INDEX`
+- `delete INDEX`
+- `find KEYWORD`
+- `bye`
