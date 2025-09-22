@@ -6,20 +6,52 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
 
-/** Lightweight natural-date parser for commands (no external libs). */
-public final class NaturalDates {
+/**
+ * Utility for parsing lightweight "natural language" date expressions
+ * (e.g., "today", "next Mon", "in 2 weeks") into {@link LocalDate}.
+ * <p>
+ * Supports both natural keywords and a few common date formats, without
+ * using any external libraries.
+ */public final class NaturalDates {
     private NaturalDates() {}
 
-    // Accept a few friendly textual formats
+    /**
+     * Supported explicit date formats (in addition to keywords).
+     * Examples:
+     * - 2025-10-01
+     * - 1/10/2025
+     * - 1-10-2025
+     * - 1 Oct 2025
+     * - Oct 1 2025
+     */
     private static final DateTimeFormatter[] PATTERNS = new DateTimeFormatter[] {
-            DateTimeFormatter.ISO_LOCAL_DATE,                    // 2025-10-01
-            DateTimeFormatter.ofPattern("d/M/uuuu"),             // 1/10/2025
-            DateTimeFormatter.ofPattern("d-M-uuuu"),             // 1-10-2025
-            DateTimeFormatter.ofPattern("d MMM uuuu", Locale.ENGLISH),   // 1 Oct 2025
-            DateTimeFormatter.ofPattern("MMM d uuuu", Locale.ENGLISH)    // Oct 1 2025
+            DateTimeFormatter.ISO_LOCAL_DATE, // 2025-10-01
+            DateTimeFormatter.ofPattern("d/M/uuuu"), // 1/10/2025
+            DateTimeFormatter.ofPattern("d-M-uuuu"), // 1-10-2025
+            DateTimeFormatter.ofPattern("d MMM uuuu", Locale.ENGLISH), // 1 Oct 2025
+            DateTimeFormatter.ofPattern("MMM d uuuu", Locale.ENGLISH) // Oct 1 2025
     };
 
-    /** Parses natural or formatted date strings relative to 'today'. */
+    /**
+     * Parses a natural-language or formatted date string relative to a given "today".
+     *
+     * <p>Examples:
+     * <ul>
+     *   <li>"today" → {@code today}</li>
+     *   <li>"tomorrow" → {@code today.plusDays(1)}</li>
+     *   <li>"yesterday" → {@code today.minusDays(1)}</li>
+     *   <li>"in 3 days" → {@code today.plusDays(3)}</li>
+     *   <li>"in 2 weeks" → {@code today.plusWeeks(2)}</li>
+     *   <li>"next Monday" → next Monday strictly after today</li>
+     *   <li>"Mon" → next Monday strictly after today</li>
+     *   <li>"2025-10-01" → parsed using ISO format</li>
+     * </ul>
+     *
+     * @param raw   the input string (must not be null or empty)
+     * @param today the base date to interpret relative expressions
+     * @return parsed {@link LocalDate}
+     * @throws IllegalArgumentException if input is null, empty, or unrecognized
+     */
     public static LocalDate parse(String raw, LocalDate today) {
         if (raw == null) throw new IllegalArgumentException("date string is null");
         String s = raw.trim().toLowerCase(Locale.ENGLISH);
@@ -52,7 +84,7 @@ public final class NaturalDates {
         DayOfWeek maybeDow = parseDayOfWeek(s);
         if (maybeDow != null) return next(maybeDow, today);
 
-        // Try known explicit patterns
+        // Try explicit date patterns
         for (DateTimeFormatter f : PATTERNS) {
             try {
                 return LocalDate.parse(raw.trim(), f);
@@ -79,7 +111,15 @@ public final class NaturalDates {
         }
     }
 
-    /** Next occurrence of DOW strictly after 'from' (i.e., excludes today). */
+    /**
+     * Returns the next occurrence of the given day of week strictly after {@code from}.
+     * <p>
+     * If {@code from} is already the given day, returns 7 days later.
+     *
+     * @param target the desired day of week
+     * @param from   the base date
+     * @return the next matching date
+     */
     private static LocalDate next(DayOfWeek target, LocalDate from) {
         int add = (target.getValue() - from.getDayOfWeek().getValue() + 7) % 7;
         if (add == 0) add = 7; // "next Mon" means next week if today is Mon
