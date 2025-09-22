@@ -1,0 +1,23 @@
+.dialog-user {
+    -fx-background-color: #D6E4FF;
+    -fx-text-fill: #111827;
+    -fx-padding: 8 12 8 12;
+    -fx-background-radius: 10;
+}
+
+.dialog-bot {
+    -fx-background-color: #BBF7D0; /* medium-light green */
+    -fx-text-fill: #064E3B;       /* dark green text for contrast */
+    -fx-padding: 8 12 8 12;
+    -fx-background-radius: 10;
+}
+
+.dialog-error {
+    -fx-background-color: #FEE2E2;
+    -fx-text-fill: #7F1D1D;
+    -fx-padding: 8 12 8 12;
+    -fx-background-radius: 10;
+    -fx-border-color: #EF4444;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+}

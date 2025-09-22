@@ -14,7 +14,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 public class DialogBox extends HBox {
-
     @FXML
     private Label dialog;
     @FXML
@@ -32,11 +31,10 @@ public class DialogBox extends HBox {
 
         dialog.setText(text);
         displayPicture.setImage(img);
+
     }
 
-    /**
-     * Flips the dialog box such that the ImageView is on the left and text on the right.
-     */
+
     private void flip() {
         ObservableList<Node> tmp = FXCollections.observableArrayList(this.getChildren());
         Collections.reverse(tmp);
@@ -44,12 +42,25 @@ public class DialogBox extends HBox {
         setAlignment(Pos.TOP_LEFT);
     }
 
-    public static DialogBox getUserDialog(String s, Image i) {
-        return new DialogBox(s, i);
+    /** User message: right-aligned, styled as .dialog-user */
+    public static DialogBox getUserDialog(String text, Image img) {
+        DialogBox db = new DialogBox(text, img);
+        db.dialog.getStyleClass().add("dialog-user");
+        return db;
     }
 
-    public static DialogBox getDukeDialog(String s, Image i) {
-        var db = new DialogBox(s, i);
+    /** Jack (bot) message: left-aligned bubble. */
+    public static DialogBox getJackDialog(String text, Image img) {
+        DialogBox db = new DialogBox(text, img);
+        db.dialog.getStyleClass().add("dialog-bot");
+        db.flip();
+        return db;
+    }
+
+    /** Error message: left-aligned bubble, highlighted red. */
+    public static DialogBox getErrorDialog(String text, Image img) {
+        DialogBox db = new DialogBox(text, img);
+        db.dialog.getStyleClass().add("dialog-error");
         db.flip();
         return db;
     }
