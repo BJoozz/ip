@@ -8,7 +8,5 @@ T | 0 | read book
 T | 0 | dhada
 D | 0 | submit report | 2025-10-01
 D | 0 | submit report | 2025-10-01
-D | 0 | submit report | 2025-10-01
 D | 1 | submit report | 2025-09-29
-D | 0 | submit report | 2025-09-24
 D | 0 | submit report | 2025-09-23

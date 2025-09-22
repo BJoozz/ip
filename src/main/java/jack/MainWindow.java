@@ -28,13 +28,22 @@ public class MainWindow extends AnchorPane {
     @FXML
     public void initialize() {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
+
+        // Add stylesheet once the scene is ready
+        dialogContainer.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.getStylesheets().add(
+                        getClass().getResource("/css/dialog.css").toExternalForm()
+                );
+            }
+        });
     }
 
     /** Injects the Duke instance */
     public void setJack(Jack d) {
         jack = d;
         dialogContainer.getChildren().add(
-                DialogBox.getDukeDialog(jack.getWelcomeMessage(), dukeImage)
+                DialogBox.getJackDialog(jack.getWelcomeMessage(), dukeImage)
         );
     }
 
@@ -48,7 +57,7 @@ public class MainWindow extends AnchorPane {
         String response = jack.getResponse(input);
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
-                DialogBox.getDukeDialog(response, dukeImage)
+                DialogBox.getJackDialog(response, dukeImage)
         );
         userInput.clear();
     }
