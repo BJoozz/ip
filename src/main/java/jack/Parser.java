@@ -27,6 +27,16 @@ public class Parser {
     private static final Pattern BY_TOKEN   = Pattern.compile("\\s+/by\\s+");
     private static final Pattern FROM_TOKEN = Pattern.compile("\\s+/from\\s+");
     private static final Pattern TO_TOKEN   = Pattern.compile("\\s+/to\\s+");
+
+    /**
+     * Splits an input string into a command word and its remaining arguments.
+     * <p>
+     * The first space separates the command word (returned in lowercase) and
+     * the rest of the string (may be empty if no arguments are present).
+     *
+     * @param input full user input string
+     * @return a 2-element array: [command word, arguments]
+     */
     private static String[] splitOnce(String input) {
         assert input != null : "splitOnce: input must not be null";
         String t = input.trim();
@@ -98,6 +108,15 @@ public class Parser {
         }
     }
 
+    /**
+     * Persists the current task list to storage, ignoring any errors.
+     * <p>
+     * If saving fails, the error is silently ignored because persistence
+     * is considered non-critical for command execution.
+     *
+     * @param tasks   the current in-memory task list
+     * @param storage the storage handler
+     */
     private static void persist(TaskList tasks, Storage storage) {
         try {
             storage.save(tasks.raw());
@@ -106,6 +125,13 @@ public class Parser {
         }
     }
 
+    /**
+     * Displays a confirmation block after a new task is added.
+     *
+     * @param ui    the UI handler to display messages
+     * @param tasks the current in-memory task list
+     * @param t     the newly added task
+     */
     private static void confirmAdd(Ui ui, TaskList tasks, Task t) {
         ui.showBlock("Got it. I've added this task:", "  " + t,
                 "Now you have " + tasks.size() + " tasks in the list.");
