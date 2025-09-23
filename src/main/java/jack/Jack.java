@@ -12,10 +12,14 @@ import jack.ui.Ui;
  */
 public class Jack {
     private final Storage storage;
+
+    /** In-memory list of tasks currently managed by the application. */
     private TaskList tasks;
     private final Ui ui;
     /**
      * Creates a new {@code Jack} application instance.
+     *
+     * @param isGui true if running with a graphical interface, false otherwise
      */
     public Jack(boolean isGui) {
         ui = new Ui(isGui);
@@ -75,7 +79,13 @@ public class Jack {
     }
 
     /**
-     * Generates a response for the user's chat message.
+     * Processes a single user input and returns the chatbot's response.
+     * <p>
+     * If the input is an exit command, this method will also request
+     * application termination.
+     *
+     * @param input user input string
+     * @return response string from Jack
      */
     public String getResponse(String input) {
         try {
@@ -93,6 +103,11 @@ public class Jack {
         }
     }
 
+    /**
+     * Generates the welcome message shown at application startup.
+     *
+     * @return welcome message string
+     */
     public String getWelcomeMessage() {
         ui.showWelcome();
         return ui.getCaptured();
