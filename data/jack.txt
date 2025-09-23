@@ -1,6 +1,6 @@
 D | 0 | return book | 2025-06-06
 T | 0 | join sports club
-T | 0 | borrow book
+T | 1 | borrow book
 T | 1 | learn
 T | 0 | hellobook
 T | 0 | read 10 books

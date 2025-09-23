@@ -3,6 +3,8 @@
     -fx-text-fill: #111827;
     -fx-padding: 8 12 8 12;
     -fx-background-radius: 10;
+    /*-fx-border-color: #d55e00 #009e73 #cc79a7 #0072b2;*/
+    -fx-border-width: 2px;
 }
 
 .dialog-bot {
@@ -10,6 +12,8 @@
     -fx-text-fill: #064E3B;       /* dark green text for contrast */
     -fx-padding: 8 12 8 12;
     -fx-background-radius: 10;
+    /*-fx-border-color: #d55e00 #009e73 #cc79a7 #0072b2;*/
+    -fx-border-width: 2px;
 }
 
 .dialog-error {
